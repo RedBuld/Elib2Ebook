@@ -85,6 +85,7 @@ public class NovelcoolGetter(BookGetterConfig config) : GetterBase(config) {
         // important Referrer, do not remove
         Config.Client.DefaultRequestHeaders.Remove("Referer");
         Config.Client.DefaultRequestHeaders.Add("Referer", referrer.ToString());
+        // Config.Logger.LogInformation($"R1: {chapterUrl}|{referrer.ToString()}");
         var redirection_response = await Config.Client.GetWithTriesAsync(chapterUrl);
 
         var redirection_doc = await redirection_response.Content.ReadAsStreamAsync().ContinueWith(t => t.Result.AsHtmlDoc(null));
@@ -95,10 +96,15 @@ public class NovelcoolGetter(BookGetterConfig config) : GetterBase(config) {
         // important Referrer, do not remove
         Config.Client.DefaultRequestHeaders.Remove("Referer");
         Config.Client.DefaultRequestHeaders.Add("Referer", redirection_response.RequestMessage.RequestUri.ToString());
+        // Config.Logger.LogInformation($"R2: {redirection_url}|{redirection_response.RequestMessage.RequestUri.ToString()}");
         var doc = await Config.Client.GetHtmlDocWithTriesAsync(redirection_url);
 
+        // Config.Logger.LogInformation($"doc: {doc.ParsedText}");
+
         var temp = Regex.Match(doc.ParsedText, @"all_imgs_url\:\s+(?<data>\[(.*)\]),", RegexOptions.Multiline | RegexOptions.Singleline).Groups["data"].Value;
+        // Config.Logger.LogInformation($"temp: {temp}");
         temp = Regex.Replace(temp, @",\s+\]", "]");
+        // Config.Logger.LogInformation($"temp: {temp}");
         var json = temp.Deserialize<JsonArray>();
     
         var sb = new StringBuilder();
@@ -130,7 +136,7 @@ public class NovelcoolGetter(BookGetterConfig config) : GetterBase(config) {
 
         var toc_chapters = new List<object>();
 
-        var index = 0;
+        var index = Config.Options.Start ?? 0;
         foreach( var chapter in chapters )
         {
             var toc_chapter = new NovelcoolTocChapter

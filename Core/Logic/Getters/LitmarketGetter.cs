@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +21,11 @@ public class LitmarketGetter(BookGetterConfig config) : GetterBase(config) {
     protected override Uri SystemUrl => new("https://litmarket.ru");
 
     public override async Task Init() {
-        await base.Init();
+        Config.Client.DefaultRequestVersion = HttpVersion.Version20;
+        Config.Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Linux; Android 14; SAMSUNG SM-T970; 1024x768) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/22.0 Chrome/112.4199.25.29 Mobile Safari/537.36");
+        Config.Client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        Config.Client.DefaultRequestHeaders.Add("Accept-Language", "ru");
+        Config.Client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
         
         Config.Client.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
         
